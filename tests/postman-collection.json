@@ -1,0 +1,179 @@
+{
+  "info": {
+    "name": "BDF Lab 03 - Books REST API",
+    "description": "Success and failure tests for the Lab 3 Books API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "bookId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/"
+      }
+    },
+    {
+      "name": "Create book - 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Created with 201', function () { pm.response.to.have.status(201); });",
+              "const body = pm.response.json();",
+              "if (body.data && body.data.id) pm.collectionVariables.set('bookId', body.data.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"The Alchemist\",\"author\":\"Paulo Coelho\",\"price\":299}"
+        },
+        "url": "{{baseUrl}}/books"
+      }
+    },
+    {
+      "name": "List books - 200",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/books"
+      }
+    },
+    {
+      "name": "Search, sort, filter and paginate",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/books?search_q=alchemist&order_by=price&order=DESC&min_price=100&max_price=500&limit=5&offset=0"
+      }
+    },
+    {
+      "name": "Invalid sort column - 400",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/books?order_by=password"
+      }
+    },
+    {
+      "name": "Invalid price range - 400",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/books?min_price=500&max_price=100"
+      }
+    },
+    {
+      "name": "Get book by ID - 200",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/books/{{bookId}}"
+      }
+    },
+    {
+      "name": "Missing book - 404",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/books/999999"
+      }
+    },
+    {
+      "name": "Create with missing title - 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"author\":\"Unknown Author\",\"price\":100}"
+        },
+        "url": "{{baseUrl}}/books"
+      }
+    },
+    {
+      "name": "Create with non-numeric price - 400",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"Invalid Price\",\"author\":\"Unknown Author\",\"price\":\"abc\"}"
+        },
+        "url": "{{baseUrl}}/books"
+      }
+    },
+    {
+      "name": "Update book - 200",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"The Alchemist - Updated\",\"author\":\"Paulo Coelho\",\"price\":349}"
+        },
+        "url": "{{baseUrl}}/books/{{bookId}}"
+      }
+    },
+    {
+      "name": "Update missing book - 404",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\":\"Missing\",\"author\":\"Nobody\",\"price\":1}"
+        },
+        "url": "{{baseUrl}}/books/999999"
+      }
+    },
+    {
+      "name": "Delete book - 200",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/books/{{bookId}}"
+      }
+    },
+    {
+      "name": "Delete missing book - 404",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/books/999999"
+      }
+    }
+  ]
+}
